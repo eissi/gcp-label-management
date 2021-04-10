@@ -1,6 +1,7 @@
 
 from googleapiclient.discovery import build
 import google.auth
+from datetime import datetime
 
 
 credentials, _ = google.auth.default()
@@ -18,6 +19,72 @@ org = rm_v1_client.organizations().get(name=parent).execute()
 print(org,end="\n\n")
 
 def project_label_check(project):
+    p = rm_v1_client.projects().get(projectId=project['projectId']).execute()
+    print(p,end='\n\n')
+
+    print(p['labels'],end='\n\n')
+
+    email_body = "Following label(s) is(are) missing.\n or empty.\n \n\n"
+    #service, team, manager, cost, startdate, enddate, environment, type, company
+    if 'service' in p['labels']:
+        if p['labels']['service'].isspace() or p['labels']['service'] == "":
+            email_body += "  - [service] label is empty.\n"
+    else:
+        email_body += "  - [service] label is missing.\n"
+
+    if 'team' in p['labels']:
+        if p['labels']['team'].isspace() or p['labels']['team'] == "":
+            email_body += "  - [team] label is empty.\n"
+    else:
+        email_body += "  - [team] label is missing.\n"
+
+    if 'manager' in p['labels']:
+        if p['labels']['manager'].isspace() or p['labels']['manager'] == "":
+            email_body += "  - [manager] label is empty.\n"
+    else:
+        email_body += "  - [manager] label is missing.\n"
+
+    if 'cost' in p['labels']:
+        if p['labels']['cost'].isspace() or p['labels']['cost'] == "":
+            email_body += "  - [cost] label is empty.\n"
+    else:
+        email_body += "  - [cost] label is missing.\n"
+
+    if 'environment' in p['labels']:
+        if p['labels']['environment'].isspace() or p['labels']['environment'] == "":
+            email_body += "  - [environment] label is empty.\n"
+    else:
+        email_body += "  - [environment] label is missing.\n"
+
+    if 'type' in p['labels']:
+        if p['labels']['type'].isspace() or p['labels']['type'] == "":
+            email_body += "  - [type] label is empty.\n"
+    else:
+        email_body += "  - [type] label is missing.\n"
+
+    if 'company' in p['labels']:
+        if p['labels']['company'].isspace() or p['labels']['company'] == "":
+            email_body += "  - [company] label is empty.\n"
+    else:
+        email_body += "  - [company] label is missing.\n"
+
+    if 'startdate' in p['labels']:
+        if p['labels']['startdate'].isspace() or p['labels']['startdate'] == "":
+            email_body += "  - [startdate] label is empty.\n"
+    else:
+        email_body += "  - [startdate] label is missing.\n"
+
+    if 'enddate' in p['labels']:
+        try:
+            endtime = datetime.strptime(p['labels']['enddate'], "%Y-%m-%d")            
+            if endtime < datetime.now():
+                email_body += "  - [enddate] The project is overdue.\n"
+        except:
+            email_body += "  - [enddate] label is not valid.\n"
+    else:
+        email_body += "  - [enddate] label is missing.\n"
+
+    print(email_body,end='\n\n')
     return
 
 def folder_check(tree_path, folder):
