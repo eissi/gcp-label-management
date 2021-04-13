@@ -6,7 +6,11 @@ import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
-alert_mail_to = os.environ.get('ALERT_EMAIL_TO')
+
+alert_mail_to_env = os.environ.get('ALERT_EMAIL_TO')
+alert_mail_to = alert_mail_to_env.split(',')
+print(alert_mail_to,end='\n\n')
+
 alert_mail_from = os.environ.get('ALERT_EMAIL_FROM')
 
 credentials, _ = google.auth.default()
