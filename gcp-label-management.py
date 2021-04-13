@@ -112,8 +112,8 @@ def project_label_check(p):
     print(email_body,end='\n\n')
 
     if email_body != default_body:
-        print("temp")
-        #sendmail('[Warning] Google Project ID, {}, has violated the labeling policy'.format(p['projectId']), email_body)
+        #print("temp")
+        sendmail('[Warning] Google Project ID, {}, has violated the labeling policy'.format(p['projectId']), email_body)
 
     return
 
