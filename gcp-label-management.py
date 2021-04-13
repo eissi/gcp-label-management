@@ -116,8 +116,8 @@ def project_label_check(p):
     print(email_body,end='\n\n')
 
     if email_body != default_body:
-        #print("temp")
-        sendmail('[Warning] Google Project ID, {}, has violated the labeling policy'.format(p['projectId']), email_body)
+        print("temp")
+        #sendmail('[Warning] Google Project ID, {}, has violated the labeling policy'.format(p['projectId']), email_body)
 
     return
 
@@ -134,6 +134,7 @@ def folder_check(tree_path, folder):
     #folder_ids = [f['name'].split('/')[1] for f in folders_under_org['folders']]
     filter='parent.type="folder" AND parent.id="{}" AND lifecycleState="ACTIVE"'.format(folder['name'].split('/')[1])
     print(filter,end='\n\n')
+
     projects_under_folder = rm_v1_client.projects().list(filter=filter).execute()
     print(projects_under_folder,end='\n\n')
     if projects_under_folder:
@@ -169,8 +170,22 @@ def project_labeling_management(request):
         folder_check("root", f)
 
     filter='parent.type="organization" AND parent.id={} AND lifecycleState="ACTIVE"'.format(ORGANIZATION_ID)
+
+    # pageToken=""
+    # while True:
     projects_under_org = rm_v1_client.projects().list(filter=filter).execute()
-    print(projects_under_org, end="\n\n")
+    print(projects_under_org,end='\n\n')
+    # projects_under_org = rm_v1_client.projects().list(filter=filter, pageSize=1, pageToken=projects_under_org['nextPageToken']).execute()
+    # print(projects_under_org,end='\n\n')
+    # projects_under_org = rm_v1_client.projects().list(filter=filter, pageSize=2, pageToken=projects_under_org['nextPageToken']).execute()
+    # print(projects_under_org,end='\n\n')
+    if 'nextPageToken' in projects_under_org:
+        # pageToken = projects_under_org['nextPageToken']
+        print(pageToken,end='\n\n')
+        print("Page tokenization should be implemented")
+        return 0
+
+    # print(projects_under_org, end="\n\n")
 
     for p in projects_under_org['projects']:
         print(p,end="\n\n")
@@ -185,6 +200,9 @@ def project_labeling_management(request):
             project['labels']={'organization_tree': 'root'}
         print(project,end='\n\n')
         rm_v1_client.projects().update(projectId=p['projectId'],body=project).execute()
+
+        # if pageToken == "":
+        #     break
 
     return "Success"
 
