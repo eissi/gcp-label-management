@@ -222,7 +222,7 @@ def project_labeling_management(request):
             raise Exception("Sorry, page tokenization should be implemented")
 
         # print(projects_under_org, end="\n\n")
-        if 'projects' in projects_under_org:
+        if projects_under_org:
             for p in projects_under_org['projects']:
                 print(p,end="\n\n")
                 project_label_check(p)
