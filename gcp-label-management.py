@@ -112,11 +112,11 @@ def project_label_check(p):
         if 'enddate' in p['labels']:
             try:
                 endtime = datetime.strptime(p['labels']['enddate'], "%Y-%m-%d")   
-                print(endtime)
-                print(datetime.now()+timedelta(days=7),end='\n\n')        
-                print(endtime<datetime.now())
-                print(endtime<datetime.now()+ timedelta(days=7))
-                print(endtime<datetime.now()+ timedelta(days=30)) 
+                # print(endtime)
+                # print(datetime.now()+timedelta(days=7),end='\n\n')        
+                # print(endtime<datetime.now())
+                # print(endtime<datetime.now()+ timedelta(days=7))
+                # print(endtime<datetime.now()+ timedelta(days=30)) 
 
                 if endtime < datetime.now():
                     print('[Warning] Google Project ID, {}, has passed the end date.'.format(p['projectId']),end='\n\n')
@@ -204,6 +204,7 @@ def project_labeling_management(request):
         folder_check("root", f)
 
     filter='parent.type="organization" AND parent.id={} AND lifecycleState="ACTIVE"'.format(ORGANIZATION_ID)
+    print('filter: {}'.format(filter),end='\n\n')
 
     if folder_to_manage == "root":
             # pageToken=""
@@ -221,23 +222,23 @@ def project_labeling_management(request):
             raise Exception("Sorry, page tokenization should be implemented")
 
         # print(projects_under_org, end="\n\n")
+        if 'projects' in projects_under_org:
+            for p in projects_under_org['projects']:
+                print(p,end="\n\n")
+                project_label_check(p)
 
-        for p in projects_under_org['projects']:
-            print(p,end="\n\n")
-            project_label_check(p)
+                #set organization_tree empty as it's on the root
+                project = rm_v1_client.projects().get(projectId=p['projectId']).execute()
+                print(project,end='\n\n')
+                if 'labels' in project:
+                    project['labels']['organization_tree'] = 'root'
+                else:
+                    project['labels']={'organization_tree': 'root'}
+                print(project,end='\n\n')
+                rm_v1_client.projects().update(projectId=p['projectId'],body=project).execute()
 
-            #set organization_tree empty as it's on the root
-            project = rm_v1_client.projects().get(projectId=p['projectId']).execute()
-            print(project,end='\n\n')
-            if 'labels' in project:
-                project['labels']['organization_tree'] = 'root'
-            else:
-                project['labels']={'organization_tree': 'root'}
-            print(project,end='\n\n')
-            rm_v1_client.projects().update(projectId=p['projectId'],body=project).execute()
-
-                # if pageToken == "":
-                #     break
+                    # if pageToken == "":
+                    #     break
 
     return "Success"
 
